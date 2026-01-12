@@ -1,0 +1,15 @@
+{
+  "HomePage": {
+    "title": "Xin chào thế giới!"
+  },
+  "notFound": {
+    "title": "404 Không tìm thấy",
+    "description": "Trang bạn đang tìm kiếm không tồn tại.",
+    "linkText": "Quay lại trang chủ"
+  },
+  "error": {
+    "title": "Đã xảy ra lỗi",
+    "description": "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại sau.",
+    "btnText": "Thử lại"
+  }
+}

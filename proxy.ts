@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import createMiddleware from "next-intl/middleware";
+import { routing } from "@/i18n/routing";
 import { auth } from "@/auth/auth";
+
+const intlProxy = createMiddleware(routing);
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -8,10 +12,14 @@ export async function proxy(req: NextRequest) {
     return NextResponse.next();
   }
 
-  if (pathname.startsWith("/dashboard")) {
+  const segments = pathname.split("/");
+  const locale = segments[1];
+  const pathWithoutLocale = `/${segments.slice(2).join("/")}`;
+
+  if (pathWithoutLocale.startsWith("/dashboard")) {
     const session = await auth();
     if (!session) {
-      return NextResponse.redirect(new URL("/login", req.url));
+      return NextResponse.redirect(new URL(`/${locale}/login`, req.url));
     }
   }
 
@@ -21,9 +29,9 @@ export async function proxy(req: NextRequest) {
     );
   }
 
-  return NextResponse.next();
+  return intlProxy(req);
 }
 
 export const config = {
-  matcher: ["/api/:path*", "/dashboard/:path*"],
+  matcher: ["/", "/(en|vi)/:path*", "/api/:path*"],
 };

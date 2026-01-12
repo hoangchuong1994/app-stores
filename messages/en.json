@@ -1,0 +1,15 @@
+{
+  "HomePage": {
+    "title": "Hello world!"
+  },
+  "notFound": {
+    "title": "404 Not Found",
+    "description": "The page you are looking for does not exist.",
+    "linkText": "Go back to Home"
+  },
+  "error": {
+    "title": "An Error Occurred",
+    "description": "An unexpected error has occurred. Please try again later.",
+    "btnText": "Retry"
+  }
+}
