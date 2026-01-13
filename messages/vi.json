@@ -2,6 +2,22 @@
   "HomePage": {
     "title": "Xin chào thế giới!"
   },
+
+  "hero": {
+    "title": "Nền tảng eCommerce SaaS cho Startup hiện đại",
+    "description": "Xây dựng, vận hành và mở rộng hệ thống bán hàng trực tuyến trên một nền tảng thống nhất. Tối ưu tốc độ, trải nghiệm và khả năng scale ngay từ ngày đầu.",
+    "cta": {
+      "start": "Tạo cửa hàng miễn phí",
+      "demo": "Xem demo"
+    }
+  },
+  "cta": {
+    "title": "Sẵn sàng bắt đầu bán hàng?",
+    "description": "Tạo cửa hàng miễn phí, không cần thẻ tín dụng. Chỉ mất vài phút để khởi tạo.",
+    "primary": "Bắt đầu ngay",
+    "secondary": "Xem demo",
+    "close": "Đóng"
+  },
   "notFound": {
     "title": "404 Không tìm thấy",
     "description": "Trang bạn đang tìm kiếm không tồn tại.",
@@ -11,5 +27,12 @@
     "title": "Đã xảy ra lỗi",
     "description": "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại sau.",
     "btnText": "Thử lại"
+  },
+  "text-login": {
+    "title": "Đăng nhập vào tài khoản của bạn",
+    "emailPlaceholder": "Nhập email của bạn",
+    "passwordPlaceholder": "Nhập mật khẩu của bạn",
+    "btnText": "Đăng nhập",
+    "forgotPassword": "Quên mật khẩu?"
   }
 }

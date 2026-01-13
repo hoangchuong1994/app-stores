@@ -2,6 +2,21 @@
   "HomePage": {
     "title": "Hello world!"
   },
+  "hero": {
+    "title": "Modern eCommerce SaaS platform for Startups",
+    "description": "Build, operate, and scale your online commerce system on a unified platform. Optimized for speed, experience, and scalability from day one.",
+    "cta": {
+      "start": "Create store for free",
+      "demo": "View demo"
+    }
+  },
+  "cta": {
+    "title": "Ready to start selling?",
+    "description": "Create your store for free. No credit card required. Get started in minutes.",
+    "primary": "Get started",
+    "secondary": "View demo",
+    "close": "Close"
+  },
   "notFound": {
     "title": "404 Not Found",
     "description": "The page you are looking for does not exist.",
@@ -11,5 +26,12 @@
     "title": "An Error Occurred",
     "description": "An unexpected error has occurred. Please try again later.",
     "btnText": "Retry"
+  },
+  "text-login": {
+    "title": "Login to your account",
+    "emailPlaceholder": "Enter your email",
+    "passwordPlaceholder": "Enter your password",
+    "btnText": "Login",
+    "forgotPassword": "Forgot your password?"
   }
 }
