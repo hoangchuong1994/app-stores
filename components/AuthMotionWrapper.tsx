@@ -1,15 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useSafeMotion } from "@/hooks/use-safe-motion";
+import { slideUp } from "@/lib/motion/slide";
 
 export function AuthMotionWrapper({ children }: { children: React.ReactNode }) {
+  const animation = useSafeMotion(slideUp);
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 20, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      className="w-full max-w-md"
-    >
+    <motion.section {...animation} className="w-full max-w-md">
       {children}
     </motion.section>
   );

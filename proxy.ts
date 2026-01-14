@@ -16,7 +16,10 @@ export async function proxy(req: NextRequest) {
   const locale = segments[1];
   const pathWithoutLocale = `/${segments.slice(2).join("/")}`;
 
-  if (pathWithoutLocale.startsWith("/dashboard")) {
+  if (
+    pathWithoutLocale.startsWith(`${locale}/dashboard`) ||
+    pathWithoutLocale === `/${locale}/dashboard`
+  ) {
     const session = await auth();
     if (!session) {
       return NextResponse.redirect(new URL(`/${locale}/login`, req.url));
