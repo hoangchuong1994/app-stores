@@ -1,24 +1,17 @@
-import { signIn } from "@/auth/auth";
-import { useLocale, useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
+import { LoginForm } from "@/components/LoginForm";
 
-export default function Home() {
-  const locale = useLocale();
-  const t = useTranslations("text-login");
+export default async function LoginPage() {
+  const t = await getTranslations("auth.login");
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <form
-          action={async () => {
-            "use server";
-            await signIn("google", {
-              callbackUrl: "/",
-              redirectTo: `/${locale}/dashboard`,
-            });
-          }}
-        >
-          <button type="submit">{t("btnText")}</button>
-        </form>
-      </main>
-    </div>
+    <>
+      <header className="mb-6 text-center">
+        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{t("description")}</p>
+      </header>
+
+      {/* <LoginForm /> */}
+    </>
   );
 }

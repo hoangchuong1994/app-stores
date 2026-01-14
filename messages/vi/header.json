@@ -1,0 +1,14 @@
+{
+  "brand": "EcomSaaS",
+  "nav": {
+    "features": "Tính năng",
+    "solutions": "Giải pháp",
+    "pricing": "Giá",
+    "docs": "Tài liệu"
+  },
+  "action": {
+    "login": "Đăng nhập",
+    "start": "Bắt đầu",
+    "dashboard": "Dashboard"
+  }
+}

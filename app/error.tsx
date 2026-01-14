@@ -13,7 +13,7 @@ export default function Error({
     console.error(error);
   }, [error]);
 
-  const t = useTranslations("error");
+  const t = useTranslations("errors");
   return (
     <div className="h-screen flex flex-col items-center justify-center">
       <h2>{t("title")}</h2>

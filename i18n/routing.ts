@@ -26,5 +26,9 @@ export const routing = defineRouting({
       vi: "/xac-thuc/dang-ky",
       en: "/auth/sign-up",
     },
+    "/auth/forgot-password": {
+      vi: "/xac-thuc/quen-mat-khau",
+      en: "/auth/forgot-password",
+    },
   },
 });

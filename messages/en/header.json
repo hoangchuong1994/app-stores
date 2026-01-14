@@ -1,0 +1,14 @@
+{
+  "brand": "EcomSaaS",
+  "nav": {
+    "features": "Features",
+    "solutions": "Solutions",
+    "pricing": "Pricing",
+    "docs": "Documentation"
+  },
+  "action": {
+    "login": "Sign in",
+    "start": "Get started",
+    "dashboard": "Dashboard"
+  }
+}
