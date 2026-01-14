@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 
 export function Hero() {
-  const t = useTranslations("hero");
+  const t = useTranslations("common.hero");
 
   return (
     <section className="container mx-auto px-4 py-24 text-center">

@@ -11,7 +11,7 @@ export default async function LoginPage() {
         <p className="mt-2 text-sm text-muted-foreground">{t("description")}</p>
       </header>
 
-      {/* <LoginForm /> */}
+      <LoginForm />
     </>
   );
 }
