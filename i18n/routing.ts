@@ -18,9 +18,13 @@ export const routing = defineRouting({
       vi: "/bang-dieu-khien",
       en: "/dashboard",
     },
-    "/login": {
-      vi: "/dang-nhap",
-      en: "/login",
+    "/auth/sign-in": {
+      vi: "/xac-thuc/dang-nhap",
+      en: "/auth/sign-in",
+    },
+    "/auth/sign-up": {
+      vi: "/xac-thuc/dang-ky",
+      en: "/auth/sign-up",
     },
   },
 });

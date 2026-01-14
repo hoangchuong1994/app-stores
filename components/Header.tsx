@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
+import { auth } from "@/auth/auth";
 
-export function Header() {
+export async function Header() {
+  const session = await auth();
   return (
     <header className="w-full border-b bg-background">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -22,8 +25,20 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost">Đăng nhập</Button>
-          <Button>Bắt đầu</Button>
+          {!session ? (
+            <>
+              <Button variant="ghost" asChild>
+                <Link href="/auth/sign-in">Đăng nhập</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/auth/sign-up">Bắt đầu</Link>
+              </Button>
+            </>
+          ) : (
+            <Button asChild>
+              <Link href="/dashboard">Dashboard</Link>
+            </Button>
+          )}
         </div>
       </div>
     </header>
