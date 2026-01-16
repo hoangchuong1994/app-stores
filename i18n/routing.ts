@@ -30,5 +30,13 @@ export const routing = defineRouting({
       vi: "/xac-thuc/quen-mat-khau",
       en: "/auth/forgot-password",
     },
+    "/terms": {
+      vi: "/dieu-khoan",
+      en: "/terms",
+    },
+    "/privacy": {
+      vi: "/chinh-sach-bao-mat",
+      en: "/privacy",
+    },
   },
 });

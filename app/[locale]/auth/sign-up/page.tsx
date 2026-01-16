@@ -2,22 +2,23 @@ import { getTranslations } from "next-intl/server";
 import { RegisterForm } from "@/components/RegisterForm";
 import { OAuthButtons } from "@/components/OAuthButtons";
 import { Divider } from "@/components/Divider";
+import { AuthHeader } from "@/components/auth/AuthHeader";
+import { AuthFooter } from "@/components/auth/AuthFooter";
 
 export default async function RegisterPage() {
   const t = await getTranslations("auth.register");
 
   return (
     <>
-      <header className="mb-6 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{t("description")}</p>
-      </header>
-
+      <AuthHeader title={t("title")} description={t("description")} />
       <OAuthButtons />
-
       <Divider text={t("divider")} />
-
       <RegisterForm />
+      <AuthFooter
+        text={t("haveAccount")}
+        linkText={t("signIn")}
+        href="/auth/sign-in"
+      />
     </>
   );
 }

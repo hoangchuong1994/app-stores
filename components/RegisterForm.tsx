@@ -3,21 +3,28 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { Link } from "@/i18n/navigation";
 
-type RegisterValues = {
-  name: string;
-  email: string;
-  password: string;
-};
+import { registerSchema, RegisterValues } from "@/schema/register";
 
 export function RegisterForm() {
   const t = useTranslations("auth.register");
   const [loading, setLoading] = useState(false);
 
   const form = useForm<RegisterValues>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -35,53 +42,75 @@ export function RegisterForm() {
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-      <div className="space-y-1.5">
-        <label className="text-sm font-medium">{t("name.label")}</label>
-        <Input
-          className="h-11 rounded-xl"
-          placeholder={t("name.placeholder")}
-          {...form.register("name", { required: true })}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+        {/* Name */}
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("name.label")}</FormLabel>
+              <FormControl>
+                <Input
+                  autoComplete="name"
+                  placeholder={t("name.placeholder")}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div className="space-y-1.5">
-        <label className="text-sm font-medium">{t("email.label")}</label>
-        <Input
-          type="email"
-          className="h-11 rounded-xl"
-          placeholder={t("email.placeholder")}
-          {...form.register("email", { required: true })}
+        {/* Email */}
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("email.label")}</FormLabel>
+              <FormControl>
+                <Input
+                  autoComplete="email"
+                  type="email"
+                  placeholder={t("email.placeholder")}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div className="space-y-1.5">
-        <label className="text-sm font-medium">{t("password.label")}</label>
-        <Input
-          type="password"
-          className="h-11 rounded-xl"
-          placeholder={t("password.placeholder")}
-          {...form.register("password", { required: true })}
+        {/* Password */}
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("password.label")}</FormLabel>
+              <FormControl>
+                <Input
+                  autoComplete="current-password"
+                  type="password"
+                  placeholder={t("password.placeholder")}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <Button
-        type="submit"
-        disabled={loading}
-        className="h-11 w-full rounded-xl text-base"
-      >
-        {loading ? t("loading") : t("submit")}
-      </Button>
-
-      <p className="text-center text-sm text-muted-foreground">
-        {t("haveAccount")}{" "}
-        <Link
-          href="/auth/sign-in"
-          className="font-medium text-primary hover:underline"
+        <Button
+          type="submit"
+          disabled={loading}
+          className="h-11 w-full rounded-xl text-base"
         >
-          {t("signIn")}
-        </Link>
-      </p>
-    </form>
+          {loading ? t("loading") : t("submit")}
+        </Button>
+      </form>
+    </Form>
   );
 }

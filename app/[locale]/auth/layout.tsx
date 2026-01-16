@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { AuthMotionWrapper } from "@/components/AuthMotionWrapper";
+import { AuthCard } from "@/components/auth/AuthCard";
 
 export default function AuthenticationLayout({
   children,
@@ -7,20 +8,22 @@ export default function AuthenticationLayout({
   children: ReactNode;
 }) {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-background via-muted/40 to-background">
-      {/* Background glow */}
-      <div className="pointer-events-none absolute inset-0 flex justify-center">
-        <div className="mt-[-120px] h-[320px] w-[320px] rounded-full bg-primary/20 blur-[120px]" />
+    <main className="relative flex min-h-screen overflow-hidden bg-linear-to-br from-background via-primary/5 to-muted/60 bg-slate-200">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 flex justify-center"
+      >
+        <div className="-mt-30 h-60 w-60 sm:h-80 sm:w-80 rounded-full bg-primary/35 dark:bg-primary/25 blur-[140px]" />
       </div>
 
-      {/* Centered content */}
-      <div className="relative z-10 flex min-h-screen items-center justify-center px-4">
+      <section
+        aria-label="Authentication"
+        className="relative z-10 flex flex-1 items-center justify-center px-4"
+      >
         <AuthMotionWrapper>
-          <div className="rounded-2xl border bg-background p-8 shadow-lg">
-            {children}
-          </div>
+          <AuthCard>{children}</AuthCard>
         </AuthMotionWrapper>
-      </div>
+      </section>
     </main>
   );
 }

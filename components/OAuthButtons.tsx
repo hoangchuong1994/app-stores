@@ -22,7 +22,7 @@ type Provider = {
 
 const PROVIDERS: Provider[] = [
   { id: "google", Icon: GoogleIcon },
-  { id: "github", Icon: GithubIcon },
+  // { id: "github", Icon: GithubIcon },
 ];
 
 export function OAuthButtons() {
