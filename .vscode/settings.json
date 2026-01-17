@@ -1,0 +1,53 @@
+{
+	"editor.fontFamily": "'Courier New' ,'JetBrains Mono', 'Consolas', 'monospace'",
+	"editor.fontLigatures": true,
+	"editor.fontSize": 12,
+	"editor.lineHeight": 22,
+	"editor.fontWeight": "500",
+
+	"editor.insertSpaces": false,
+	"editor.tabSize": 2,
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.detectIndentation": false,
+	"editor.formatOnPaste": true,
+	"editor.formatOnType": true,
+	"tailwindCSS.experimental.classRegex": [
+		"clsx\\(([^)]*)\\)",
+		"twMerge\\(([^)]*)\\)",
+		"cn\\(([^)]*)\\)"
+	],
+	"editor.minimap.enabled": true,
+	"editor.folding": true,
+	"typescript.preferences.importModuleSpecifier": "non-relative",
+	"javascript.preferences.importModuleSpecifier": "non-relative",
+	"tailwindCSS.includeLanguages": {
+		"typescript": "javascript",
+		"typescriptreact": "javascript"
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+
+	"[javascriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[markdown]": {
+		"editor.wordWrap": "on",
+		"editor.formatOnSave": false,
+		"editor.quickSuggestions": {
+			"other": false,
+			"comments": false,
+			"strings": false
+		}
+	}
+}

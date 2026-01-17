@@ -1,27 +1,35 @@
-import { Link } from "@/i18n/navigation";
-import { LogoIcon } from "../icons/AuthIcon";
+import { Link } from '@/i18n/navigation';
+
+import { LogoIcon } from '../icons/AuthIcon';
 
 type AuthHeaderProps = {
-  title: string;
-  description?: string;
+	title: string;
+	description?: string;
 };
 
 export function AuthHeader({ title, description }: AuthHeaderProps) {
-  return (
-    <header className="mb-6 text-center">
-      <Link
-        href="/"
-        className="flex items-center justify-center gap-2 mb-2 mr-2"
-      >
-        <LogoIcon className="h-10 w-10 text-fuchsia-500" />
-        <span className="text-xl font-bold tracking-tight">
-          Shop<span className="text-primary">zy</span>
-        </span>
-      </Link>
-      <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-      {description && (
-        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-      )}
-    </header>
-  );
+	return (
+		<header className="mb-6 space-y-1 text-center">
+			<Link
+				href="/"
+				className="mr-2 mb-2 flex items-center justify-center gap-2"
+			>
+				<LogoIcon className="h-10 w-10 text-fuchsia-500" />
+				<span className="text-xl font-bold tracking-tight">
+					Shop
+					<span className="bg-linear-to-r from-fuchsia-500 to-violet-500 bg-clip-text text-transparent">
+						zy
+					</span>
+				</span>
+			</Link>
+			<h1 className="text-2xl leading-tight font-semibold tracking-tight">
+				{title}
+			</h1>
+			{description && (
+				<p className="text-muted-foreground text-sm leading-relaxed">
+					{description}
+				</p>
+			)}
+		</header>
+	);
 }
