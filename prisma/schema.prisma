@@ -7,12 +7,6 @@ datasource db {
   provider = "postgresql"
 }
 
-enum UserRole {
-  ADMIN
-  MODERATOR
-  USER
-}
-
 enum UserStatus {
   ACTIVE
   INACTIVE
@@ -72,6 +66,19 @@ enum ShipmentStatus {
   DELIVERED
   RETURNED
   CANCELLED
+}
+
+model Role {
+  id          String       @id @default(cuid())
+  name        String       @unique // admin, user, editor
+  permissions Permission[]
+  users       User[]
+}
+
+model Permission {
+  id    String @id @default(cuid())
+  code  String @unique // "user:create", "product:delete"
+  roles Role[]
 }
 
 // --------------------------------------------------
@@ -135,7 +142,7 @@ model User {
   emailVerified        DateTime?
   password             String?
   image                String?
-  role                 UserRole   @default(USER)
+  roleId               String?
   status               UserStatus @default(ACTIVE)
   lastLoginAt          DateTime?
   lastPasswordChangeAt DateTime?
@@ -155,8 +162,8 @@ model User {
   products        Product[]     @relation("UserProducts")
   updatedProducts Product[]     @relation("UserUpdatedProducts")
   couponUsages    CouponUsage[]
+  role            Role?         @relation(fields: [roleId], references: [id])
 
-  @@index([role])
   @@index([status])
   @@map("users")
 }

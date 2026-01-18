@@ -3,7 +3,6 @@
 	"editor.fontLigatures": true,
 	"editor.fontSize": 12,
 	"editor.lineHeight": 22,
-	"editor.fontWeight": "500",
 
 	"editor.insertSpaces": false,
 	"editor.tabSize": 2,

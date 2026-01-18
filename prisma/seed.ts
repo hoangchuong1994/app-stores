@@ -1,52 +1,121 @@
-// import { PrismaClient, Prisma } from "../app/generated/prisma/client";
-// import { PrismaPg } from "@prisma/adapter-pg";
-// import "dotenv/config";
+import 'dotenv/config';
+import bcrypt from 'bcryptjs';
+import { PrismaClient } from '../app/generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
-// const adapter = new PrismaPg({
-//   connectionString: process.env.DATABASE_URL,
-// });
+/**
+ * Prisma client (PostgreSQL)
+ */
+const prisma = new PrismaClient({
+	adapter: new PrismaPg({
+		connectionString: process.env.DATABASE_URL!,
+	}),
+});
 
-// const prisma = new PrismaClient({
-//   adapter,
-// });
+/**
+ * CONSTANTS
+ */
+const PERMISSIONS = [
+	'admin.access',
+	'user.read',
+	'user.write',
+	'product.read',
+	'product.write',
+] as const;
 
-// const userData: Prisma.UserCreateInput[] = [
-//   {
-//     name: "Alice",
-//     email: "alice@prisma.io",
-//     posts: {
-//       create: [
-//         {
-//           title: "Join the Prisma Discord",
-//           content: "https://pris.ly/discord",
-//           published: true,
-//         },
-//         {
-//           title: "Prisma on YouTube",
-//           content: "https://pris.ly/youtube",
-//         },
-//       ],
-//     },
-//   },
-//   {
-//     name: "Bob",
-//     email: "bob@prisma.io",
-//     posts: {
-//       create: [
-//         {
-//           title: "Follow Prisma on Twitter",
-//           content: "https://www.twitter.com/prisma",
-//           published: true,
-//         },
-//       ],
-//     },
-//   },
-// ];
+type RoleName = 'ADMIN' | 'MODERATOR' | 'USER';
 
-// export async function main() {
-//   for (const u of userData) {
-//     await prisma.user.create({ data: u });
-//   }
-// }
+const ROLE_PERMISSIONS: Record<RoleName, readonly string[]> = {
+	ADMIN: PERMISSIONS,
+	MODERATOR: ['user.read', 'product.read', 'product.write'],
+	USER: ['product.read'],
+};
 
-// main();
+async function main() {
+	console.log('🌱 Start seeding RBAC...');
+
+	/**
+	 * 1. Seed permissions
+	 */
+	const permissions = await Promise.all(
+		PERMISSIONS.map((code) =>
+			prisma.permission.upsert({
+				where: { code },
+				update: {},
+				create: { code },
+			}),
+		),
+	);
+
+	console.log('✅ Permissions seeded');
+
+	/**
+	 * 2. Seed roles + assign permissions
+	 */
+	for (const roleName of Object.keys(ROLE_PERMISSIONS) as RoleName[]) {
+		const permissionCodes = ROLE_PERMISSIONS[roleName];
+
+		await prisma.role.upsert({
+			where: { name: roleName },
+			update: {
+				permissions: {
+					set: permissions
+						.filter((p) => permissionCodes.includes(p.code))
+						.map((p) => ({ id: p.id })),
+				},
+			},
+			create: {
+				name: roleName,
+				permissions: {
+					connect: permissions
+						.filter((p) => permissionCodes.includes(p.code))
+						.map((p) => ({ id: p.id })),
+				},
+			},
+		});
+
+		console.log(`✅ Role ${roleName} seeded`);
+	}
+
+	/**
+	 * 3. Create / sync admin user
+	 */
+	const adminRole = await prisma.role.findUnique({
+		where: { name: 'ADMIN' },
+	});
+
+	if (!adminRole) {
+		throw new Error('ADMIN role not found – RBAC seed failed');
+	}
+
+	await prisma.user.upsert({
+		where: { email: 'admin@test.com' },
+		update: {
+			roleId: adminRole.id,
+			status: 'ACTIVE',
+		},
+		create: {
+			email: 'admin@test.com',
+			name: 'Admin',
+			password: await bcrypt.hash('123456', 10),
+			roleId: adminRole.id,
+			status: 'ACTIVE',
+		},
+	});
+
+	console.log('✅ Admin user ready');
+	console.log('🎉 Seed completed successfully');
+}
+
+/**
+ * Run seed
+ */
+main()
+	.catch((err) => {
+		console.error('❌ Seed failed');
+		console.error(err);
+		process.exit(1);
+	})
+	.finally(async () => {
+		await prisma.$disconnect();
+	});

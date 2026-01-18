@@ -1,77 +1,124 @@
-import NextAuth from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import prisma from "@/lib/prisma";
+import NextAuth from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
+import Google from 'next-auth/providers/google';
+import { PrismaAdapter } from '@auth/prisma-adapter';
+import bcrypt from 'bcryptjs';
 
-import Google from "next-auth/providers/google";
-import Github from "next-auth/providers/github";
-import Credentials from "next-auth/providers/credentials";
+import prisma from '@/lib/prisma';
 
-import { verifyPassword } from "@/lib/password";
-import { toAuthUser } from "@/lib/to-auth-user";
+export const { handlers, auth, signIn, signOut } = NextAuth({
+	adapter: PrismaAdapter(prisma),
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: PrismaAdapter(prisma),
-  session: {
-    strategy: "jwt",
-  },
-  trustHost: true,
-  providers: [
-    Credentials({
-      name: "credentials",
-      authorize: async (credentials) => {
-        try {
-          if (
-            !credentials?.email ||
-            typeof credentials.email !== "string" ||
-            !credentials.password ||
-            typeof credentials.password !== "string"
-          ) {
-            return null;
-          }
+	secret: process.env.AUTH_SECRET,
 
-          const user = await prisma.user.findUnique({
-            where: { email: credentials.email },
-            select: {
-              id: true,
-              email: true,
-              name: true,
-              password: true,
-            },
-          });
+	session: {
+		strategy: 'jwt',
+	},
 
-          if (!user || !user.password || !user.email) {
-            return null;
-          }
+	pages: {
+		signIn: '/auth/sign-in',
+		error: '/auth/error',
+	},
 
-          const isValid = await verifyPassword(
-            credentials.password,
-            user.password
-          );
+	providers: [
+		Google,
 
-          if (!isValid) {
-            return null;
-          }
+		Credentials({
+			name: 'credentials',
 
-          return toAuthUser({
-            id: user.id,
-            email: user.email,
-            name: user.name,
-          });
-        } catch (err) {
-          console.error("Error in Credentials authorize:", err);
-          return null;
-        }
-      },
-    }),
+			credentials: {
+				email: { type: 'email' },
+				password: { type: 'password' },
+			},
 
-    Google({
-      clientId: process.env.AUTH_GOOGLE_ID!,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET!,
-    }),
+			async authorize(credentials) {
+				if (
+					!credentials ||
+					typeof credentials.email !== 'string' ||
+					typeof credentials.password !== 'string'
+				) {
+					return null;
+				}
 
-    Github({
-      clientId: process.env.AUTH_GITHUB_ID!,
-      clientSecret: process.env.AUTH_GITHUB_SECRET!,
-    }),
-  ],
+				const user = await prisma.user.findUnique({
+					where: { email: credentials.email },
+					include: {
+						role: {
+							include: {
+								permissions: true,
+							},
+						},
+					},
+				});
+
+				if (!user || !user.password || !user.role || user.status !== 'ACTIVE')
+					return null;
+
+				const valid = await bcrypt.compare(credentials.password, user.password);
+
+				if (!valid) return null;
+
+				return {
+					id: user.id,
+					email: user.email,
+					name: user.name,
+					image: user.image,
+					role: user.role.name,
+					permissions: user.role.permissions.map((p) => p.code),
+				};
+			},
+		}),
+	],
+
+	callbacks: {
+		async jwt({ token, user }) {
+			if (user) {
+				token.id = user.id;
+				token.role = user.role;
+				token.permissions = user.permissions;
+			}
+
+			if (token.id && (!token.role || !token.permissions)) {
+				const dbUser = await prisma.user.findUnique({
+					where: { id: token.id as string },
+					include: {
+						role: { include: { permissions: true } },
+					},
+				});
+
+				if (dbUser?.role) {
+					token.role = dbUser.role.name;
+					token.permissions = dbUser.role.permissions.map((p) => p.code);
+				}
+			}
+			return token;
+		},
+
+		async session({ session, token }) {
+			if (session.user && token.id && token.role && token.permissions) {
+				session.user.id = token.id;
+				session.user.role = token.role;
+				session.user.permissions = token.permissions;
+			}
+			return session;
+		},
+	},
+	events: {
+		async createUser({ user }) {
+			const role = await prisma.role.findUnique({
+				where: { name: 'USER' },
+			});
+
+			if (!role) {
+				throw new Error('USER role not seeded');
+			}
+
+			await prisma.user.update({
+				where: { id: user.id },
+				data: {
+					roleId: role.id,
+				},
+			});
+		},
+	},
 });
