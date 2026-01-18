@@ -13,7 +13,7 @@ export default function Dashboard() {
 		<div className="space-y-4">
 			<h1>Session debug</h1>
 
-			<pre className="bg-muted rounded-md p-4 text-sm">
+			<pre className="bg-muted overflow-hidden rounded-md p-4 text-sm">
 				{JSON.stringify(session, null, 2)}
 			</pre>
 		</div>

@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { auth } from '@/auth/auth';
+import { auth } from '@/authentication/auth';
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { routing } from '@/i18n/routing';

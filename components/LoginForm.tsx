@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-
+import { ROUTES } from '@/config/routes';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -107,7 +107,7 @@ export function LoginForm() {
 				{/* Forgot password */}
 				<div className="flex justify-end">
 					<Link
-						href="/auth/forgot-password"
+						href={ROUTES.AUTH.FORGOT_PASSWORD}
 						className="text-muted-foreground hover:text-foreground text-sm transition"
 					>
 						{t('forgotPassword')}

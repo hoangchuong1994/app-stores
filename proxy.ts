@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 import { routing } from '@/i18n/routing';
-import { auth } from '@/auth/auth';
+import { auth } from '@/authentication/auth';
 import { getPathname } from '@/i18n/navigation';
+import { ROUTES } from '@/config/routes';
+import { ADMIN_ROUTES } from '@/config/access';
 
 /* --------------------------------------------------
  * Types
@@ -30,7 +32,8 @@ function stripLocale(pathname: string): string {
 	const [, first, ...rest] = pathname.split('/');
 
 	if (first && isLocale(first)) {
-		return `/${rest.join('/')}`;
+		const stripped = `/${rest.join('/')}`;
+		return stripped === '' ? '/' : stripped;
 	}
 
 	return pathname;
@@ -55,19 +58,53 @@ export async function proxy(req: NextRequest) {
 	const locale = extractLocale(pathname);
 	const pathWithoutLocale = stripLocale(pathname);
 
-	// 2️⃣ Protect dashboard (đa locale)
-	const dashboardPaths = Object.values(routing.pathnames['/dashboard']);
+	const protectedPathnames = [
+		...Object.values(routing.pathnames[ROUTES.DASHBOARD]),
+		...Object.values(routing.pathnames[ROUTES.ADMIN.ROOT]),
+		...Object.values(routing.pathnames[ROUTES.ACCOUNT.ROOT]),
+	];
 
-	if (dashboardPaths.some((p) => pathWithoutLocale.startsWith(p))) {
+	// 2️⃣ Protect dashboard (đa locale, type-safe)
+	if (protectedPathnames.some((p) => pathWithoutLocale.startsWith(p))) {
 		const session = await auth();
 
 		if (!session) {
 			const signInPath = getPathname({
 				locale,
-				href: '/auth/sign-in',
+				href: ROUTES.AUTH.SIGN_IN,
 			});
 
 			return NextResponse.redirect(new URL(signInPath, req.url));
+		}
+
+		/* --------------------------------------------------
+		 * 3️⃣ AUTHORIZATION (RBAC – permission based)
+		 * -------------------------------------------------- */
+		for (const [routeKey, requiredPermissions] of Object.entries(
+			ADMIN_ROUTES,
+		)) {
+			const localizedPaths =
+				routing.pathnames[routeKey as keyof typeof routing.pathnames];
+
+			if (!localizedPaths) continue;
+
+			const isMatch = Object.values(localizedPaths).some((p) =>
+				pathWithoutLocale.startsWith(p),
+			);
+
+			if (!isMatch) continue;
+
+			const userPermissions = session.user.permissions ?? [];
+
+			const hasPermission = requiredPermissions.some((permission) =>
+				userPermissions.includes(permission),
+			);
+
+			if (!hasPermission) {
+				return NextResponse.redirect(
+					new URL(getPathname({ locale, href: ROUTES.AUTH.ERROR }), req.url),
+				);
+			}
 		}
 	}
 
@@ -76,14 +113,8 @@ export async function proxy(req: NextRequest) {
 }
 
 /* --------------------------------------------------
- * Matcher
+ * Matcher (tối ưu, không chạy dư)
  * -------------------------------------------------- */
 export const config = {
-	matcher: [
-		'/',
-		'/(en|vi)/:path*',
-		'/auth/:path*',
-		'/dashboard/:path*',
-		'/api/:path*',
-	],
+	matcher: ['/', '/(vi|en)/:path*', '/api/:path*'],
 };

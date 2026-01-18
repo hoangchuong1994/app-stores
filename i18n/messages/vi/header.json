@@ -1,0 +1,14 @@
+{
+	"brand": "EcomSaaS",
+	"nav": {
+		"shop": "Cửa hàng",
+		"categories": "Danh mục",
+		"deals": "Khuyến mãi",
+		"about": "Giới thiệu"
+	},
+	"action": {
+		"login": "Đăng nhập",
+		"start": "Bắt đầu ngay",
+		"dashboard": "Bảng điều khiển"
+	}
+}

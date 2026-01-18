@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react';
-
+import { ROUTES } from '@/config/routes';
 import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
@@ -27,11 +27,17 @@ export function AuthFooter({ text, linkText, href }: AuthFooterProps) {
 
 			<p className="text-muted-foreground text-xs">
 				{t('prefix')}
-				<Link href="/terms" className="underline underline-offset-2">
+				<Link
+					href={ROUTES.LEGAL.TERMS}
+					className="underline underline-offset-2"
+				>
 					{t('terms')}
 				</Link>
 				{t('and')}
-				<Link href="/privacy" className="underline underline-offset-2">
+				<Link
+					href={ROUTES.LEGAL.PRIVACY}
+					className="underline underline-offset-2"
+				>
 					{t('privacy')}
 				</Link>
 				.

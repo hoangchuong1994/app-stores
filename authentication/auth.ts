@@ -3,7 +3,6 @@ import Credentials from 'next-auth/providers/credentials';
 import Google from 'next-auth/providers/google';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import bcrypt from 'bcryptjs';
-
 import prisma from '@/lib/prisma';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -101,6 +100,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				session.user.permissions = token.permissions;
 			}
 			return session;
+		},
+
+		async redirect({ url, baseUrl }) {
+			if (url.startsWith('/')) {
+				return `${baseUrl}${url}`;
+			}
+			return url;
 		},
 	},
 	events: {
