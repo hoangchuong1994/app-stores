@@ -13,6 +13,14 @@ enum UserStatus {
   BANNED
 }
 
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  STAFF
+  SELLER
+  CUSTOMER
+}
+
 enum ProductStatus {
   DRAFT
   ACTIVE
@@ -70,7 +78,7 @@ enum ShipmentStatus {
 
 model Role {
   id          String       @id @default(cuid())
-  name        String       @unique // admin, user, editor
+  name        UserRole     @unique
   permissions Permission[]
   users       User[]
 }

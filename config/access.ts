@@ -1,38 +1,40 @@
-import { ROUTES } from './routes';
+import { APP_ROUTES } from './app-routes';
+import type { AppRoute } from './app-routes';
+
+/* --------------------------------------------------
+ * PUBLIC ROUTES
+ * -------------------------------------------------- */
+export const PUBLIC_ROUTES: readonly AppRoute[] = [
+	APP_ROUTES.HOME,
+	APP_ROUTES.LEGAL.TERMS,
+	APP_ROUTES.LEGAL.PRIVACY,
+];
+
+/* --------------------------------------------------
+ * AUTH REQUIRED
+ * -------------------------------------------------- */
+export const AUTH_ROUTES: readonly AppRoute[] = [
+	APP_ROUTES.AUTH.SIGN_IN,
+	APP_ROUTES.AUTH.SIGN_UP,
+	APP_ROUTES.AUTH.FORGOT_PASSWORD,
+	APP_ROUTES.AUTH.ERROR,
+	APP_ROUTES.AUTH.FORBIDDEN,
+];
 
 /* ----------------------------------
- * Public routes (ai cũng vào được)
- * ---------------------------------- */
-export const PUBLIC_ROUTES = [
-	ROUTES.HOME,
-
-	ROUTES.AUTH.SIGN_IN,
-	ROUTES.AUTH.SIGN_UP,
-	ROUTES.AUTH.FORGOT_PASSWORD,
-	ROUTES.AUTH.ERROR,
-
-	ROUTES.LEGAL.TERMS,
-	ROUTES.LEGAL.PRIVACY,
-] as const;
-
-/* ----------------------------------
- * Protected routes (chỉ cần login)
+ * Protected routes
  * ---------------------------------- */
 export const PROTECTED_ROUTES = [
-	ROUTES.DASHBOARD,
-
-	ROUTES.ACCOUNT.ROOT,
-	ROUTES.ACCOUNT.PROFILE,
-	ROUTES.ACCOUNT.SECURITY,
-
-	ROUTES.CART,
+	APP_ROUTES.DASHBOARD,
+	APP_ROUTES.ACCOUNT.ROOT,
+	APP_ROUTES.CART,
 ] as const;
 
-/* ----------------------------------
- * Admin routes (cần permission)
- * ---------------------------------- */
-export const ADMIN_ROUTES = {
-	[ROUTES.ADMIN.ROOT]: ['admin.access'],
-	[ROUTES.ADMIN.USERS]: ['user.read', 'user.write'],
-	[ROUTES.ADMIN.PRODUCTS]: ['product.read', 'product.write'],
-} as const;
+/* --------------------------------------------------
+ * ADMIN AREA
+ * -------------------------------------------------- */
+export const ADMIN_ROUTES: readonly AppRoute[] = [
+	APP_ROUTES.ADMIN.ROOT,
+	APP_ROUTES.ADMIN.USERS,
+	APP_ROUTES.ADMIN.PRODUCTS,
+];

@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/authentication/auth';
 import { getPathname } from '@/i18n/navigation';
-import type { AppRoute } from '@/config/routes';
+import type { AppRoute } from '@/config/app-routes';
 
 export async function requireAuth(
 	req: NextRequest,

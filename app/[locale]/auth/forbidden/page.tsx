@@ -3,7 +3,7 @@
 import { useTranslations, useLocale } from 'next-intl';
 import { ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ROUTES } from '@/config/routes';
+import { APP_ROUTES } from '@/config/app-routes';
 import { Link } from '@/i18n/navigation';
 import { signOutAction } from '@/actions/actions';
 
@@ -23,7 +23,7 @@ export default function ForbiddenPage() {
 
 			<div className="mt-6 flex w-full flex-col gap-2">
 				<Button asChild>
-					<Link href={ROUTES.DASHBOARD}>{t('backToDashboard')}</Link>
+					<Link href={APP_ROUTES.DASHBOARD}>{t('backToDashboard')}</Link>
 				</Button>
 
 				<form action={signOutAction.bind(null, locale)}>

@@ -4,6 +4,7 @@ import Google from 'next-auth/providers/google';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/prisma';
+import { ROLE_SCOPES } from '@/authentication/roles';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
 	adapter: PrismaAdapter(prisma),
@@ -42,11 +43,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				const user = await prisma.user.findUnique({
 					where: { email: credentials.email },
 					include: {
-						role: {
-							include: {
-								permissions: true,
-							},
-						},
+						role: true,
 					},
 				});
 
@@ -57,13 +54,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
 				if (!valid) return null;
 
+				const roleName = user.role.name;
+				const scopes = ROLE_SCOPES[user.role.name] ?? [];
+
 				return {
 					id: user.id,
 					email: user.email,
 					name: user.name,
 					image: user.image,
-					role: user.role.name,
-					permissions: user.role.permissions.map((p) => p.code),
+					role: roleName,
+					scopes: [...scopes],
 				};
 			},
 		}),
@@ -74,30 +74,30 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 			if (user) {
 				token.id = user.id;
 				token.role = user.role;
-				token.permissions = user.permissions;
+				token.scopes = [...user.scopes];
 			}
 
-			if (token.id && (!token.role || !token.permissions)) {
+			if (token.id && (!token.role || !token.scopes)) {
 				const dbUser = await prisma.user.findUnique({
 					where: { id: token.id as string },
-					include: {
-						role: { include: { permissions: true } },
-					},
+					include: { role: true },
 				});
 
 				if (dbUser?.role) {
+					const scopes = ROLE_SCOPES[dbUser.role.name] ?? [];
 					token.role = dbUser.role.name;
-					token.permissions = dbUser.role.permissions.map((p) => p.code);
+					token.scopes = [...scopes];
 				}
 			}
+
 			return token;
 		},
 
 		async session({ session, token }) {
-			if (session.user && token.id && token.role && token.permissions) {
+			if (session.user && token.id && token.role && token.scopes) {
 				session.user.id = token.id;
 				session.user.role = token.role;
-				session.user.permissions = token.permissions;
+				session.user.scopes = [...token.scopes];
 			}
 			return session;
 		},
@@ -112,11 +112,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 	events: {
 		async createUser({ user }) {
 			const role = await prisma.role.findUnique({
-				where: { name: 'USER' },
+				where: { name: 'CUSTOMER' },
 			});
 
 			if (!role) {
-				throw new Error('USER role not seeded');
+				throw new Error('CUSTOMER role not seeded');
 			}
 
 			await prisma.user.update({

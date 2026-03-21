@@ -1,8 +1,8 @@
 -- CreateEnum
-CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'MODERATOR', 'USER');
+CREATE TYPE "UserStatus" AS ENUM ('ACTIVE', 'INACTIVE', 'BANNED');
 
 -- CreateEnum
-CREATE TYPE "UserStatus" AS ENUM ('ACTIVE', 'INACTIVE', 'BANNED');
+CREATE TYPE "UserRole" AS ENUM ('SUPER_ADMIN', 'ADMIN', 'STAFF', 'SELLER', 'CUSTOMER');
 
 -- CreateEnum
 CREATE TYPE "ProductStatus" AS ENUM ('DRAFT', 'ACTIVE', 'INACTIVE', 'OUT_OF_STOCK');
@@ -28,7 +28,7 @@ CREATE TYPE "ShipmentStatus" AS ENUM ('CREATED', 'PICKED', 'IN_TRANSIT', 'DELIVE
 -- CreateTable
 CREATE TABLE "Role" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
+    "name" "UserRole" NOT NULL,
 
     CONSTRAINT "Role_pkey" PRIMARY KEY ("id")
 );
@@ -92,7 +92,7 @@ CREATE TABLE "users" (
     "emailVerified" TIMESTAMP(3),
     "password" TEXT,
     "image" TEXT,
-    "roleId" TEXT NOT NULL DEFAULT 'USER_ROLE_ID',
+    "roleId" TEXT,
     "status" "UserStatus" NOT NULL DEFAULT 'ACTIVE',
     "lastLoginAt" TIMESTAMP(3),
     "lastPasswordChangeAt" TIMESTAMP(3),
@@ -678,7 +678,7 @@ ALTER TABLE "accounts" ADD CONSTRAINT "accounts_userId_fkey" FOREIGN KEY ("userI
 ALTER TABLE "sessions" ADD CONSTRAINT "sessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "users" ADD CONSTRAINT "users_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "users" ADD CONSTRAINT "users_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Address" ADD CONSTRAINT "Address_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

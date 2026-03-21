@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import bcrypt from 'bcryptjs';
-import { PrismaClient } from '../app/generated/prisma/client';
+import { PrismaClient, UserRole } from '../app/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 /**
@@ -12,104 +12,137 @@ const prisma = new PrismaClient({
 	}),
 });
 
-/**
- * CONSTANTS
- */
+/* --------------------------------------------------
+ * PERMISSIONS
+ * -------------------------------------------------- */
 const PERMISSIONS = [
 	'admin.access',
+
 	'user.read',
 	'user.write',
+
 	'product.read',
-	'product.write',
+	'product.create',
+	'product.update',
+	'product.delete',
+
+	'order.read',
+	'order.update',
+	'order.cancel',
+	'order.refund',
 ] as const;
 
-type RoleName = 'ADMIN' | 'MODERATOR' | 'USER';
+/* --------------------------------------------------
+ * ROLE → PERMISSIONS
+ * -------------------------------------------------- */
+const ROLE_PERMISSIONS: Record<UserRole, readonly string[]> = {
+	SUPER_ADMIN: PERMISSIONS,
 
-const ROLE_PERMISSIONS: Record<RoleName, readonly string[]> = {
-	ADMIN: PERMISSIONS,
-	MODERATOR: ['user.read', 'product.read', 'product.write'],
-	USER: ['product.read'],
+	ADMIN: [
+		'admin.access',
+		'user.read',
+		'user.write',
+		'product.read',
+		'product.create',
+		'product.update',
+		'product.delete',
+		'order.read',
+		'order.update',
+		'order.cancel',
+		'order.refund',
+	],
+
+	STAFF: ['product.read', 'product.update', 'order.read', 'order.update'],
+
+	SELLER: ['product.read', 'product.create', 'product.update', 'order.read'],
+
+	CUSTOMER: ['product.read', 'order.read'],
 };
 
-async function main() {
-	console.log('🌱 Start seeding RBAC...');
+/* --------------------------------------------------
+ * HELPERS
+ * -------------------------------------------------- */
+async function seedPermissions() {
+	await prisma.permission.createMany({
+		data: PERMISSIONS.map((code) => ({ code })),
+		skipDuplicates: true,
+	});
 
-	/**
-	 * 1. Seed permissions
-	 */
-	const permissions = await Promise.all(
-		PERMISSIONS.map((code) =>
-			prisma.permission.upsert({
-				where: { code },
-				update: {},
-				create: { code },
-			}),
-		),
-	);
+	return prisma.permission.findMany({
+		where: { code: { in: [...PERMISSIONS] } },
+	});
+}
 
-	console.log('✅ Permissions seeded');
-
-	/**
-	 * 2. Seed roles + assign permissions
-	 */
-	for (const roleName of Object.keys(ROLE_PERMISSIONS) as RoleName[]) {
-		const permissionCodes = ROLE_PERMISSIONS[roleName];
+async function seedRoles(permissions: { id: string; code: string }[]) {
+	for (const role of Object.values(UserRole)) {
+		const codes = ROLE_PERMISSIONS[role] ?? [];
+		const rolePermissions = permissions
+			.filter((p) => codes.includes(p.code))
+			.map((p) => ({ id: p.id }));
 
 		await prisma.role.upsert({
-			where: { name: roleName },
+			where: { name: role },
 			update: {
 				permissions: {
-					set: permissions
-						.filter((p) => permissionCodes.includes(p.code))
-						.map((p) => ({ id: p.id })),
+					set: rolePermissions,
 				},
 			},
 			create: {
-				name: roleName,
+				name: role,
 				permissions: {
-					connect: permissions
-						.filter((p) => permissionCodes.includes(p.code))
-						.map((p) => ({ id: p.id })),
+					connect: rolePermissions,
 				},
 			},
 		});
-
-		console.log(`✅ Role ${roleName} seeded`);
 	}
+}
 
-	/**
-	 * 3. Create / sync admin user
-	 */
-	const adminRole = await prisma.role.findUnique({
-		where: { name: 'ADMIN' },
+async function seedSuperAdmin() {
+	const role = await prisma.role.findUnique({
+		where: { name: 'SUPER_ADMIN' },
 	});
 
-	if (!adminRole) {
-		throw new Error('ADMIN role not found – RBAC seed failed');
-	}
+	if (!role) throw new Error('SUPER_ADMIN role not found');
+
+	const passwordHash = await bcrypt.hash('123456', 10);
 
 	await prisma.user.upsert({
 		where: { email: 'admin@test.com' },
 		update: {
-			roleId: adminRole.id,
+			roleId: role.id,
 			status: 'ACTIVE',
 		},
 		create: {
 			email: 'admin@test.com',
-			name: 'Admin',
-			password: await bcrypt.hash('123456', 10),
-			roleId: adminRole.id,
+			name: 'Super Admin',
+			password: passwordHash,
+			roleId: role.id,
 			status: 'ACTIVE',
 		},
 	});
-
-	console.log('✅ Admin user ready');
-	console.log('🎉 Seed completed successfully');
 }
 
-/**
- * Run seed
- */
+/* --------------------------------------------------
+ * MAIN
+ * -------------------------------------------------- */
+async function main() {
+	console.log('🌱 RBAC seed started');
+
+	const permissions = await seedPermissions();
+	console.log('✅ Permissions ready');
+
+	await seedRoles(permissions);
+	console.log('✅ Roles synced');
+
+	await seedSuperAdmin();
+	console.log('✅ Super admin ready');
+
+	console.log('🎉 Seed completed (idempotent)');
+}
+
+/* --------------------------------------------------
+ * RUN
+ * -------------------------------------------------- */
 main()
 	.catch((err) => {
 		console.error('❌ Seed failed');

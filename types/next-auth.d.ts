@@ -1,6 +1,6 @@
-import type { RoleCode, PermissionCode } from '@/types/auth.types';
 import 'next-auth';
 import 'next-auth/jwt';
+import type { RoleCode, Scope } from '@/types/auth.types';
 
 declare module 'next-auth' {
 	interface Session {
@@ -11,13 +11,13 @@ declare module 'next-auth' {
 			image?: string | null;
 
 			role: RoleCode;
-			permissions: PermissionCode[];
+			scopes: readonly Scope[];
 		};
 	}
 
 	interface User {
 		role: RoleCode;
-		permissions: PermissionCode[];
+		scopes: readonly Scope[];
 	}
 }
 
@@ -25,6 +25,6 @@ declare module 'next-auth/jwt' {
 	interface JWT {
 		id?: string;
 		role?: RoleCode;
-		permissions?: PermissionCode[];
+		scopes?: readonly Scope[];
 	}
 }

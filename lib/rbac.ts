@@ -1,10 +1,14 @@
-import { ROUTES } from '@/config/routes';
-import type { AppRoute } from '@/config/routes';
+import { APP_ROUTES } from '@/config/app-routes';
+import type { AppRoute } from '@/config/app-routes';
 
 export type UserRole = 'ADMIN' | 'MODERATOR' | 'USER';
 
 export const ROLE_ROUTES: Record<UserRole, readonly AppRoute[]> = {
-	ADMIN: [ROUTES.ADMIN.ROOT, ROUTES.ADMIN.USERS, ROUTES.ADMIN.PRODUCTS],
-	MODERATOR: [ROUTES.ADMIN.ROOT, ROUTES.ADMIN.USERS],
-	USER: [ROUTES.DASHBOARD, ROUTES.ACCOUNT.ROOT, ROUTES.CART],
+	ADMIN: [
+		APP_ROUTES.ADMIN.ROOT,
+		APP_ROUTES.ADMIN.USERS,
+		APP_ROUTES.ADMIN.PRODUCTS,
+	],
+	MODERATOR: [APP_ROUTES.ADMIN.ROOT, APP_ROUTES.ADMIN.USERS],
+	USER: [APP_ROUTES.DASHBOARD, APP_ROUTES.ACCOUNT.ROOT, APP_ROUTES.CART],
 };

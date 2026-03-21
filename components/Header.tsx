@@ -3,7 +3,7 @@ import { Link } from '@/i18n/navigation';
 import { auth } from '@/authentication/auth';
 import { getTranslations } from 'next-intl/server';
 import { ShoppingBag } from 'lucide-react';
-import { ROUTES } from '@/config/routes';
+import { APP_ROUTES } from '@/config/app-routes';
 
 export async function Header() {
 	const session = await auth();
@@ -22,25 +22,25 @@ export async function Header() {
 				{/* Navigation */}
 				<nav className="hidden items-center gap-6 text-sm font-medium md:flex">
 					<Link
-						href={ROUTES.HOME}
+						href={APP_ROUTES.HOME}
 						className="text-muted-foreground hover:text-foreground"
 					>
 						{tNav('shop')}
 					</Link>
 					<Link
-						href={ROUTES.HOME}
+						href={APP_ROUTES.HOME}
 						className="text-muted-foreground hover:text-foreground"
 					>
 						{tNav('categories')}
 					</Link>
 					<Link
-						href={ROUTES.HOME}
+						href={APP_ROUTES.HOME}
 						className="text-muted-foreground hover:text-foreground"
 					>
 						{tNav('deals')}
 					</Link>
 					<Link
-						href={ROUTES.HOME}
+						href={APP_ROUTES.HOME}
 						className="text-muted-foreground hover:text-foreground"
 					>
 						{tNav('about')}
@@ -52,15 +52,15 @@ export async function Header() {
 					{!session ? (
 						<>
 							<Button variant="ghost" asChild>
-								<Link href={ROUTES.AUTH.SIGN_IN}>{tAc('login')}</Link>
+								<Link href={APP_ROUTES.AUTH.SIGN_IN}>{tAc('login')}</Link>
 							</Button>
 							<Button asChild>
-								<Link href={ROUTES.AUTH.SIGN_UP}>{tAc('start')}</Link>
+								<Link href={APP_ROUTES.AUTH.SIGN_UP}>{tAc('start')}</Link>
 							</Button>
 						</>
 					) : (
 						<Button asChild>
-							<Link href={ROUTES.DASHBOARD}>Dashboard</Link>
+							<Link href={APP_ROUTES.DASHBOARD}>Dashboard</Link>
 						</Button>
 					)}
 				</div>

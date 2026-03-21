@@ -3,118 +3,80 @@ import createMiddleware from 'next-intl/middleware';
 import { routing } from '@/i18n/routing';
 import { auth } from '@/authentication/auth';
 import { getPathname } from '@/i18n/navigation';
-import { ROUTES } from '@/config/routes';
-import { ADMIN_ROUTES } from '@/config/access';
+import { APP_ROUTES } from '@/config/app-routes';
+import {
+	PUBLIC_ROUTES,
+	AUTH_ROUTES,
+	ADMIN_ROUTES,
+	PROTECTED_ROUTES,
+} from '@/config/access';
+import { extractLocale, matchRoute } from '@/lib/match-route';
+import { isPublicApiRoute } from '@/config/api-access';
 
-/* --------------------------------------------------
- * Types
- * -------------------------------------------------- */
-type Locale = (typeof routing.locales)[number];
-
-/* --------------------------------------------------
- * Locale helpers (NO any)
- * -------------------------------------------------- */
-function isLocale(value: string): value is Locale {
-	return routing.locales.includes(value as Locale);
-}
-
-function extractLocale(pathname: string): Locale {
-	const [, first] = pathname.split('/');
-
-	if (first && isLocale(first)) {
-		return first;
-	}
-
-	return routing.defaultLocale;
-}
-
-function stripLocale(pathname: string): string {
-	const [, first, ...rest] = pathname.split('/');
-
-	if (first && isLocale(first)) {
-		const stripped = `/${rest.join('/')}`;
-		return stripped === '' ? '/' : stripped;
-	}
-
-	return pathname;
-}
-
-/* --------------------------------------------------
- * next-intl proxy
- * -------------------------------------------------- */
 const intlProxy = createMiddleware(routing);
 
-/* --------------------------------------------------
- * PROXY middleware (GIỮ NGUYÊN KIẾN TRÚC)
- * -------------------------------------------------- */
 export async function proxy(req: NextRequest) {
 	const { pathname } = req.nextUrl;
 
-	// 1️⃣ Bỏ qua Auth.js API
-	if (pathname.startsWith('/api/auth')) {
+	// 1. Public API routes: bypass entirely
+	if (isPublicApiRoute(pathname)) {
 		return NextResponse.next();
 	}
 
-	const locale = extractLocale(pathname);
-	const pathWithoutLocale = stripLocale(pathname);
-
-	const protectedPathnames = [
-		...Object.values(routing.pathnames[ROUTES.DASHBOARD]),
-		...Object.values(routing.pathnames[ROUTES.ADMIN.ROOT]),
-		...Object.values(routing.pathnames[ROUTES.ACCOUNT.ROOT]),
-	];
-
-	// 2️⃣ Protect dashboard (đa locale, type-safe)
-	if (protectedPathnames.some((p) => pathWithoutLocale.startsWith(p))) {
-		const session = await auth();
-
-		if (!session) {
-			const signInPath = getPathname({
-				locale,
-				href: ROUTES.AUTH.SIGN_IN,
-			});
-
-			return NextResponse.redirect(new URL(signInPath, req.url));
-		}
-
-		/* --------------------------------------------------
-		 * 3️⃣ AUTHORIZATION (RBAC – permission based)
-		 * -------------------------------------------------- */
-		for (const [routeKey, requiredPermissions] of Object.entries(
-			ADMIN_ROUTES,
-		)) {
-			const localizedPaths =
-				routing.pathnames[routeKey as keyof typeof routing.pathnames];
-
-			if (!localizedPaths) continue;
-
-			const isMatch = Object.values(localizedPaths).some((p) =>
-				pathWithoutLocale.startsWith(p),
-			);
-
-			if (!isMatch) continue;
-
-			const userPermissions = session.user.permissions ?? [];
-
-			const hasPermission = requiredPermissions.some((permission) =>
-				userPermissions.includes(permission),
-			);
-
-			if (!hasPermission) {
-				return NextResponse.redirect(
-					new URL(getPathname({ locale, href: ROUTES.AUTH.ERROR }), req.url),
-				);
-			}
-		}
+	// 2. Public routes: allow without auth
+	if (matchRoute(pathname, PUBLIC_ROUTES)) {
+		return intlProxy(req);
 	}
 
-	// 3️⃣ Delegate cho next-intl
+	const locale = extractLocale(pathname);
+
+	// 3. Auth routes: redirect logged-in users to dashboard
+	if (matchRoute(pathname, AUTH_ROUTES)) {
+		const session = await auth();
+		if (session) {
+			const dashboardPath = getPathname({
+				locale,
+				href: APP_ROUTES.DASHBOARD,
+			});
+			return NextResponse.redirect(new URL(dashboardPath, req.url));
+		}
+		return intlProxy(req);
+	}
+
+	// 4. All other routes require authentication
+	const session = await auth();
+	if (!session) {
+		const signInPath = getPathname({
+			locale,
+			href: APP_ROUTES.AUTH.SIGN_IN,
+		});
+		return NextResponse.redirect(new URL(signInPath, req.url));
+	}
+
+	const scopes = session.user.scopes ?? [];
+
+	// 5. Admin routes: require 'admin' scope
+	if (matchRoute(pathname, ADMIN_ROUTES) && !scopes.includes('admin')) {
+		const forbiddenPath = getPathname({
+			locale,
+			href: APP_ROUTES.AUTH.FORBIDDEN,
+		});
+		return NextResponse.redirect(new URL(forbiddenPath, req.url));
+	}
+
+	// 6. Protected routes: require at least one scope
+	if (matchRoute(pathname, PROTECTED_ROUTES) && scopes.length === 0) {
+		const forbiddenPath = getPathname({
+			locale,
+			href: APP_ROUTES.AUTH.FORBIDDEN,
+		});
+		return NextResponse.redirect(new URL(forbiddenPath, req.url));
+	}
+
+	// 7. Allowed routes: proceed with i18n
 	return intlProxy(req);
 }
 
-/* --------------------------------------------------
- * Matcher (tối ưu, không chạy dư)
- * -------------------------------------------------- */
 export const config = {
-	matcher: ['/', '/(vi|en)/:path*', '/api/:path*'],
+	matcher: ['/', '/(vi|en)/:path*'],
 };

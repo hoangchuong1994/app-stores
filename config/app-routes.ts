@@ -1,6 +1,4 @@
-// src/config/routes.ts
-
-export const ROUTES = {
+export const APP_ROUTES = {
 	HOME: '/',
 	DASHBOARD: '/dashboard',
 
@@ -23,7 +21,7 @@ export const ROUTES = {
 		SIGN_UP: '/auth/sign-up',
 		FORGOT_PASSWORD: '/auth/forgot-password',
 		ERROR: '/auth/error',
-		FORBIDDEN: '/auth/403',
+		FORBIDDEN: '/auth/forbidden',
 	},
 
 	LEGAL: {
@@ -46,4 +44,4 @@ type DeepRoute<T> = T extends string
 /* ----------------------------------
  * AppRoute = union of all leaf routes
  * ---------------------------------- */
-export type AppRoute = DeepRoute<typeof ROUTES>;
+export type AppRoute = DeepRoute<typeof APP_ROUTES>;

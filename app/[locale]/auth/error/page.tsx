@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 
 import { Button } from '@/components/ui/button';
-import { ROUTES } from '@/config/routes';
+import { APP_ROUTES } from '@/config/app-routes';
 
 export default function AuthErrorPage() {
 	const params = useSearchParams();
@@ -22,7 +22,7 @@ export default function AuthErrorPage() {
 			<p className="text-muted-foreground text-sm">{t(error)}</p>
 
 			<Button asChild className="w-full">
-				<Link href={ROUTES.AUTH.SIGN_IN}>{t('backToLogin')}</Link>
+				<Link href={APP_ROUTES.AUTH.SIGN_IN}>{t('backToLogin')}</Link>
 			</Button>
 		</div>
 	);

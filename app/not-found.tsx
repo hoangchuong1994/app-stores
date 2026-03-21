@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ROUTES } from '@/config/routes';
+import { APP_ROUTES } from '@/config/app-routes';
 import { useTranslations } from 'next-intl';
 
 export default function NotFound() {
@@ -10,7 +10,7 @@ export default function NotFound() {
 			<h2>{t('title')}</h2>
 			<p>{t('description')}</p>
 			<Link
-				href={ROUTES.HOME}
+				href={APP_ROUTES.HOME}
 				className="mt-4 rounded-md px-4 py-2 text-black dark:bg-slate-200"
 			>
 				{t('linkText')}
