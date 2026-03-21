@@ -1,10 +1,7 @@
 {
-  "hero": {
-    "title": "Modern eCommerce SaaS platform for Startups",
-    "description": "Build, operate, and scale your online commerce system on a unified platform. Optimized for speed, experience, and scalability from day one.",
-    "cta": {
-      "start": "Create store for free",
-      "demo": "View demo"
-    }
-  }
+	"hero": {
+		"title": "Discover Your Style",
+		"description": "Premium fashion for men and women",
+		"cta": "Shop Now"
+	}
 }

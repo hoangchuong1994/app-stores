@@ -24,6 +24,13 @@ export const APP_ROUTES = {
 		FORBIDDEN: '/auth/forbidden',
 	},
 
+	SHOP: {
+		MEN: '/men',
+		WOMEN: '/women',
+		NEW: '/new',
+		SALE: '/sale',
+	},
+
 	LEGAL: {
 		TERMS: '/terms',
 		PRIVACY: '/privacy',

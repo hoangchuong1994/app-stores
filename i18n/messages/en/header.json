@@ -1,14 +1,14 @@
 {
 	"brand": "EcomSaaS",
 	"nav": {
-		"shop": "Shop",
-		"categories": "Categories",
-		"deals": "Deals",
-		"about": "About"
+		"home": "Home",
+		"men": "Men",
+		"women": "Women",
+		"newArrivals": "New Arrivals",
+		"sale": "Sale"
 	},
 	"action": {
-		"login": "Sign in",
-		"start": "Get started",
+		"search": "Search",
 		"dashboard": "Dashboard"
 	}
 }

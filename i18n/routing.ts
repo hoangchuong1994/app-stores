@@ -77,5 +77,21 @@ export const routing = defineRouting({
 			vi: '/chinh-sach-bao-mat',
 			en: '/privacy',
 		},
+		[APP_ROUTES.SHOP.MEN]: {
+			vi: '/nam',
+			en: '/men',
+		},
+		[APP_ROUTES.SHOP.WOMEN]: {
+			vi: '/nu',
+			en: '/women',
+		},
+		[APP_ROUTES.SHOP.NEW]: {
+			vi: '/moi',
+			en: '/new',
+		},
+		[APP_ROUTES.SHOP.SALE]: {
+			vi: '/giam-gia',
+			en: '/sale',
+		},
 	},
 });
